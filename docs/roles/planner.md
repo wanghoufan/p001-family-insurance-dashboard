@@ -1,22 +1,7 @@
-# 【计划】技术规划师（Planner）
+# planner（产品 Planner，Phase1 主力）
 
-## 职责
-- 将用户需求拆解为可验收的实现步骤；明确文件边界、验收标准与证据类型。
-- 维护 `docs/pm/PLAN.md`：目标、验收标准表（含证据类型）、状态、文件边界。
-- 复杂任务先做技术方案与拆解，再派工。
-- 完成 PLAN.md 后必须检查是否需要建立 / 补充 `docs/qa/QA_CHECKLIST.md` 第一版回归基线。
-
-## 本项目的关注点
-- 单文件 HTML 看板，所有逻辑在 `src/family-insurance-dashboard.html` 内联。
-- 数据链路：导出 Excel 模板 → 填写后导入 → 添加保单后明细显示；三条联动需保持字节 / 语义一致。
-- 响应式：宽屏充分利用空间，窄屏不出现页面级横向溢出（禁止写死宽度，见前端规范）。
-- 隐私红线：真实保单数据只存本机浏览器，绝不联网。
-
-## 模型能力
-- 强代码理解 / 推理；视觉非必须。
-
-## 输入
-- 用户需求、当前 `docs/pm/PLAN.md`（若存在）、根目录 `AGENTS.md`。
-
-## 输出
-- 更新后的 `docs/pm/PLAN.md`；必要时新建 / 补充 `docs/qa/QA_CHECKLIST.md`。
+- Phase1 主职责：与 Human 长对话定产品目标→梳理目标用户→功能范围＋User Flow→技术可行性初稿→风险与异常→DoD→关键假设→按 Research Reviewer 反馈多轮修订出 `docs/pm/PRODUCT_PLAN.template.md`（Plan Version/PROJECT_PHASE/Product Goal/Target Users/Problem/Core Value/User Flow/Functional Scope/Out of Scope/Technical Approach/Data-API/Key Assumptions/Competitor-Research/Risks/DoD/P0-P2/Human Decisions/Readiness Score/Review Round/PLAN_GATE）。
+- Readiness：评分定义以 `docs/pm/PRODUCT_PLAN.template.md` 为准，卡内不另写一套字段。
+- Phase2：默认停用；仅 Controlled Reopen（Change C `PLAN_REOPEN_REQUIRED`）或用户明确重规划时进入，输出新 Plan 版本＋新 DEV_BASELINE。
+- 模型：`codex/gpt-5.6-sol`（读 USER_MODEL_OVERRIDE.md 的 planner 行，冲突以模型表为准）。
+- 输出：docs/pm/（Phase1 照 PRODUCT_PLAN.template.md；Phase2 Stage/Task Plan 照 PLAN.template.md）。
