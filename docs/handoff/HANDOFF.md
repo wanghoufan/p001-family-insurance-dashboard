@@ -1,52 +1,55 @@
 # 交接与历史协作协议（HANDOFF）
 
-## 最新交接（2026-09-07 · 全量收尾代码完成未提交 + 真机项 BLOCKED）
+## 封存交接（2026-09-07 晚 · 开发暂停）
 
-> 本节为当前有效交接；下方 09-06 中午节为历史快照，与本文冲突处以本节为准。
+> 本节为当前有效交接；下方各节为历史快照，与本文冲突处以本节为准。
+> 写给下一个智能体：只读本节 + `AGENTS.md` + `docs/pm/PLAN.md` 即可开工。
 
-### 1. 本轮做了什么（全部本地验证，未 commit，等用户明确指令）
+### 1. 当前的工作进展
 
-1. **B1 R-2 加密备份**（`src/family-insurance-dashboard.html`）：「加密备份/恢复」按钮 +
-   PBKDF2-210k/AES-GCM-256 本机加解密，覆盖 8 个 localStorage 键 + IndexedDB 全部合同
-   （50MB 上限保护）。合成数据 roundtrip 通过、错密码正确拒绝；只用合成数据测，
-   未触碰真实身份证/合同。
-2. **B2**：删 store.js TEMP 注释，信标升为 `vA已加载`，脚本 `?v=20260907a` 同步。
-3. **B3**：「删除当前险种」+ `store.deleteRateType`（先清 entry 再删 type 行）；
-   `setRateCell` 接云端 + 险种行未建好时排队补写（修“需编辑两次”）；
-   `resetRateType` 同步清云端 entry（否则刷新后云端旧值覆盖回来）。
-   另修 replayed 路径 `refreshOne` 传参 bug（此前传字符串导致回读查全表）。
-4. **B4/B6 草案**：`scratch/README草案-20260907.md`、`scratch/R3-Redirect申请草案-20260907.md`
-   （均不进 Git，README 未动，共享项目未动）。
-5. **B5 部署完成**（用户授权“DOCKER部署/提交后部署新版”）：`e2c2e61` 已推送；
-   部署副本 `~/Developer/coding/docker/family-insurance-dashboard/`（clone@e2c2e61，
-   `.env.local` + `src/config.js` 已生成，均被忽略不进 Git）；
-   `family-insurance-dashboard:20260907a` 构建启动，`http://localhost:3200` 200，
-   `/config.js` 与 `/repository/*.js` 200（Dockerfile 补 COPY 生效），容器 healthy。
-   `DEPLOY_CONFIG_FILE=.deploy.family-insurance-dashboard.env` 已保存。
-   2026-09-07 晚二次部署：副本已同步到 `22053aa`（P1 三项 + CR-12 + 信标 vC），
-   镜像 `family-insurance-dashboard:20260907c` 重建启动，`:3200` 200、`config.js` 200、
-   新功能标记齐全，容器 healthy（`.env.local` 与 `src/config.js` 在 reset 后完好，porcelain 干净）。
-   注意：`docker/deploy.sh` 在本机 `/bin/bash` 3.2 下跑不到构建——第 169 行
-   `log "部署提交：$COMMIT（…）"` 全角括号紧跟变量名，`set -u` 报
-   `COMMIT: unbound variable`（最小复现已验证）。本次绕过 deploy.sh，
-   按其 Compose 路径手工执行等效步骤；修 deploy.sh（加 `${}`）是 Docker 规范仓库的事，未动。
-6. **无头冒烟对照**：基线 HEAD 与本轮在无头 Chrome 下表现一致
-   （空表、无信标——为无头环境异步启动未完成所致，非回归；昨日 QA 真机信标正常）。
-   `node --check` 5/5 通过，`git diff --check` 通过，30 个事件 handler 全有定义。
+- **代码**：`main=2c42aab`，工作树干净，与 `origin/main` 一致。链条：
+  `e2c2e61`（R-2 加密备份 + 删险种 + 费率首编入云 + Docker 补 COPY）
+  → 审查 12 项（P1×3、P2×3、P3×4，见 `docs/review/CODE_REVIEW.md`）
+  → `22053aa`（P1 三项 + CR-12 恢复侧 IDB 明示中止，信标 `vC` / `?v=20260907c`）
+  → `0a13351` + `2c42aab`（文档对齐 + 部署纪要）。
+- **运行**：`http://localhost:3200` healthy，跑的就是 `22053aa` 内容（镜像 `:20260907c`）；
+  `localhost:8000` 预览服务当前未运行，用时现起（`cd src && python3 -m http.server 8000`）。
+  部署副本 `~/Developer/coding/docker/family-insurance-dashboard/`（clone@22053aa，
+  `.env.local` + `src/config.js` 齐全且被忽略，porcelain 干净）。
+- **用户侧里程碑**：用户已亲手做完第一份加密备份（含合同）。8→6 记录差异用户决策不再追查。
+- **审查/QA 状态**：P1×3 与 CR-12 均为 VERIFY（待独立 QA 回归，失败注入未做，不得标 CLOSED）；
+  CR-04（P2 删除与在途新增竞态）待修复；P3 默认不动；CR-11 为 pre-existing。
+  `BUG-20260907-01`（云盖本机草稿）OPEN，用户接受暂缓。
+- **草案（均在 `scratch/`，不进 Git）**：`README草案-20260907.md`、`R3-Redirect申请草案-20260907.md`。
 
-### 2. 还剩什么（需用户/真机）
+### 2. 下一步的任务（按优先级）
 
-1. **commit / push**：等明确指令。改动：HANDOFF、PLAN、QA_CHECKLIST、BUGS（均为文档对齐，无代码改动）。
-2. **数据差异 8→6（用户决策：算了，不追查）**：用户称此前约 8 条、现云上 6 条。
-   代码核对：`loadAll` 云非空分支会用云行替换本机并写回，与描述吻合；
-   未做数据恢复性验证。已记 `BUGS.md` BUG-20260907-01（OPEN，用户接受暂缓），
-   根治（合并草稿）待排期。预防动作：登录/导入前先「加密备份」。
-3. **B7 L1–L5 BLOCKED**：Tailscale CLI 在本机起不来（需 Mac 端 App）、无第二设备、
-   真人 Google 登录需用户操作。待 R-3 批复 + Tailscale 就绪后按 L1→L5 实测。
-   另：`localhost:8000` 预览服务当前未运行（`lsof`/`ps` 已确认），需 `cd src && python3 -m http.server 8000` 重启 + 硬刷新（Chrome 缓存旧页面，注意 `?v=` 信标）。
-4. **实机回归待补**：真实合同加解密、大文件上限、双设备险种删除一致性、BUG-20260907-01 回归。
-5. **README 生效修改仍待确认**：草案在 `scratch/README草案-20260907.md`，用户点头后再改 README.md。
-6. 其余沿用 09-06 中午节（R-2 已交付，BACKLOG 两项已清）。
+1. **独立 QA 回归**（P1×3 + CR-12）：合成数据 roundtrip + 失败注入（IDB 不可用/超 50MB/损坏附件/错密码），通过才标 CLOSED。需真机或 QA agent。
+2. **CR-04 修不修**：用户定；P3 默认不动。
+3. **BUG-20260907-01 根治排期**：`loadAll` 改为合并（云行 + 无 `_serverId` 草稿并存）；用户定。
+4. **README 生效**：草案确认后改 `README.md`。
+5. **`docker/deploy.sh` bash 3.2 必现失败**（第 169 行全角括号紧跟 `$COMMIT`，`set -u` 报 unbound；
+   最小复现已验证）：修的话改的是 Docker 规范仓库文件，用户定；此前均用等效 Compose 步骤绕过。
+6. **L1–L5**：等 Tailscale（本机 CLI 起不来，需 Mac 端 App）+ 第二设备 + 真人登录 + R-3 批复。
+7. **日常**：大改后提醒用户随手加密备份；8000 按需启动。
+
+### 3. 注意事项及相关规矩
+
+- **Git**：提交/推送/发布/删分支一律等用户明确说，绝不自动。
+- **隐私红线**：真实保单、身份证号、合同附件绝不读取、导出、上传或写入回执/文档；
+  测试只用仓库脱敏示例或合成数据；`src/config.js` 永不进 Git（已被忽略）；
+  `service_role`/数据库密码绝不进浏览器包、镜像、Git、日志。
+- **版本规矩**：改了 JS 必须同步升 `?v=` 与标题信标（当前 `vC` / `20260907c`）；
+  Chrome 会缓存旧页面，出问题先看信标、硬刷新。
+- **端口与打开方式**：8000 开发预览（现未运行）、3200 部署版（healthy，勿停）；
+  登录回程必须走 `http`，禁止 `file://` 打开；勿动用户正在看的页面数据，“导入”会覆盖要先警告。
+- **文档路由**：任务事实→`docs/pm/PLAN.md`；Bug→`docs/qa/BUGS.md`；
+  审查→`docs/review/CODE_REVIEW.md`；产品建议→`docs/review/PRODUCT_BACKLOG.md`；
+  交接→本文件顶部。不另建平行文档，`scratch/` 不进 Git。
+- **流程**：修复后标 VERIFY，未经独立 QA 回归不得 CLOSED；P2/P3 默认不自动修；
+  用户是小白——大白话、一次一件事、先备份再动数据。
+- **数据库红线**（继承 09-06）：无 `APPROVED_FOR_EXECUTION` 禁止生产库操作；
+  Migration 只能平台仓库发布；Redirect/Site URL 变更先申请（R-3 草案在 scratch）。
 
 ---
 
@@ -364,3 +367,14 @@ Codex 的进入方式。用户最新要求始终优先。
 - 用户已有变化必须保留；提交、发布、依赖安装或外部系统操作仍需用户明确授权。
 - 目标缺失、文件冲突或 Orca 不可用时，报告原始阻塞，不创建替代品或切换通道。
 ```
+
+## 治理规则更新通知 · 2026-10-17
+- **发生了什么**：本项目的治理文件（`AGENTS.md`／角色卡／README／编排者提示词／`scripts/*`）于 2026-10-17 被母版编排者批量铺包更新到最新版。
+- **为什么**：母版当天做了一轮体系修订（触发口令改名为「你是主开发者」、复核粒度改为「交付单元」、子代理模型与执行层/判定层分界、
+  账本新增若干机器门等）。铺包时本项目的旧文件已按惯例备份为同目录的 `*.旧版-2026-10-17`，**未删除任何文件、账本内容零改动**。
+- **对你意味着什么**：不需要你做任何操作；下次开工时你读到的 `AGENTS.md` 即为新规则。
+  其中影响执行方式的三条：①口令是「你是主开发者」（旧口令「你是唯一开发者」仍可用）；
+  ②复核链**不再对每个小任务跑**，改为对「交付单元」（阶段收口）跑一次；
+  ③若你的客户端支持派子代理时传 model/强度，执行层子代理**一律用 `opencode-go/deepseek-v4.1-flash`**（真机取证走 `codex/gpt-6-luna`）。
+- **需要你确认的**：若本次铺包覆盖了你项目里**自己改过的同名治理文件**，请对照同目录的 `*.旧版-2026-10-17` 备份，把你的专属条款合并回去。
+- **回退方式**（如需）：把对应的 `*.旧版-2026-10-17` 改回原名即可。

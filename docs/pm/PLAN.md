@@ -1,5 +1,24 @@
 # PLAN.md — 当前需求与验收
 
+## 2026-09-18 主题三态切换（已完成并上线）
+
+需求：看板新增「浅色模式」与「跟随系统」，完成后直接部署上线（用户明确授权提交/推送/部署）。
+
+| 验收项 | 结果 |
+|---|---|
+| 页头新增主题按钮，深色→浅色→跟随系统循环切换，localStorage 持久化（familyTheme） | 完成（6674a2e） |
+| 浅色主题全套配色（CSS 变量收敛，含标签/图表/横幅），SVG 取色跟随主题 | 完成 |
+| 跟随系统实时响应 prefers-color-scheme；head 内联脚本防刷新闪色 | 完成 |
+| JS 语法校验 | 通过（node new Function 双脚本 OK） |
+| 提交推送 GitHub | 6674a2e 已推 origin/main |
+| Docker 部署上线 | 镜像 family-insurance-dashboard:20260918a，容器 healthy，healthz 200，3200 已含主题代码 |
+
+部署链路备注：GitHub 当日网络不稳定，部署副本用本地 `git bundle`（22053aa..main）同步后构建；
+`docker pull nginx:1.27-alpine` 经 Docker Desktop 代理成功。浏览器可视化冒烟因自动化浏览器不可用未做，
+建议用户打开 http://localhost:3200/family-insurance-dashboard.html 硬刷新（⌘⇧R）自查三态切换。
+
+---
+
 ## 2026-09-07 全量收尾（进行中，用户已说“全部都做”）
 
 目标：收掉 HANDOFF 09-06 中午 §2 全部欠账。隐私红线：只用脱敏示例/合成数据验证，
@@ -7,9 +26,9 @@
 
 | ID | 验收标准 | 预期证据 | 状态 |
 |---|---|---|---|
-| B1 | R-2 本机私有数据加密备份：身份证 sidecar + 合同 IndexedDB 可加密导出/恢复，零依赖离线可用 | 合成数据 roundtrip + `node --check` | 已实现未提交 |
-| B2 | store.js TEMP 注释清理，版本信标保留 | diff + 冒烟 | 已完成未提交 |
-| B3 | 险种可删除（含云端行）；费率格首次编辑即入云（不再需编两次） | 合成逻辑检查 + 浏览器实测 | 已实现未提交 |
+| B1 | R-2 本机私有数据加密备份：身份证 sidecar + 合同 IndexedDB 可加密导出/恢复，零依赖离线可用 | 合成数据 roundtrip + `node --check` | 已提交22053aa+已部署 |
+| B2 | store.js TEMP 注释清理，版本信标保留 | diff + 冒烟 | 已提交22053aa |
+| B3 | 险种可删除（含云端行）；费率格首次编辑即入云（不再需编两次） | 合成逻辑检查 + 浏览器实测 | 已提交22053aa |
 | B4 | README 只出草案不直接改（含云端同步说明） | scratch 草案给用户确认 | 草案完成 |
 | B5 | Docker 部署前校验通过；副本创建按规范执行 | `compose config` + 目录检查 | 已部署（:3200 healthy，见 HANDOFF） |
 | B6 | R-3 Redirect 追加只出申请草案放 scratch，不直改共享项目 | 草案文件 | 草案完成 |
