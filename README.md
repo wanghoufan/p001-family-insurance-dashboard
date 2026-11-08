@@ -4,6 +4,8 @@
 
 [English](./README.en.md)
 
+![家庭保单数据看板界面（示例数据）](docs/images/dashboard.png)
+
 ## 这是什么
 
 一个**放在自己家里跑**的单页保单看板。保单信息只存在你自己的浏览器里（localStorage / IndexedDB），也可以接自己的 Supabase 做多设备同步；不注册账号、不连第三方服务、不把你的保单传给任何人。

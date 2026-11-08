@@ -4,6 +4,8 @@ One table that finally makes the family's insurance clear: who is covered, wheth
 
 [简体中文](./README.md)
 
+![Family insurance dashboard (sample data)](docs/images/dashboard.png)
+
 ## What it is
 
 A single-page dashboard that runs **on your own machine**. Policy data lives in your browser (localStorage / IndexedDB), with optional sync through your own Supabase project. No sign-up, no third-party service, and no policy data leaves your household.
